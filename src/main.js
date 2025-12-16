@@ -26,7 +26,7 @@ pmremGenerator.compileEquirectangularShader();
 let originalEnvMap = null;
 
 new RGBELoader()
-  .load('/static/textures/hdr.hdr', (texture) => {
+  .load('/textures/hdr.hdr', (texture) => {
     texture.mapping = THREE.EquirectangularReflectionMapping;
     originalEnvMap = pmremGenerator.fromEquirectangular(texture).texture;
     scene.background = originalEnvMap;
@@ -73,7 +73,7 @@ scene.add(pedestal);
 // --- Завантаження основної моделі (монумент) ---
 let model;
 const gltfLoader = new GLTFLoader();
-gltfLoader.load('/static/models/monum.glb', (gltf) => {
+gltfLoader.load('/models/monum.glb', (gltf) => {
   model = gltf.scene;
 
   model.traverse((child) => {
@@ -111,7 +111,7 @@ gltfLoader.load('/static/models/monum.glb', (gltf) => {
 
 // --- Завантаження моделі ялинки та спавн 15 штук з перевіркою відстані ---
 let treeModel;
-gltfLoader.load('/static/models/tree.glb', (gltf) => {
+gltfLoader.load('/models/tree.glb', (gltf) => {
   treeModel = gltf.scene;
 
   treeModel.traverse((child) => {
@@ -191,7 +191,7 @@ gltfLoader.load('/static/models/tree.glb', (gltf) => {
 });
 
 // --- Завантаження та розміщення одного гнома (gnome1.glb) на п'єдесталі ---
-gltfLoader.load('/static/models/gnome1.glb', (gltf) => {
+gltfLoader.load('/models/gnome1.glb', (gltf) => {
   let gnome = gltf.scene;
 
   gnome.traverse((child) => {
@@ -217,7 +217,7 @@ gltfLoader.load('/static/models/gnome1.glb', (gltf) => {
   gnome.position.y = 5.15 ;               // стоїть на п'єдесталі (Y = 4 + його власна висота)
 
   // Позиція на п'єдесталі (можеш змінити)
-  gnome.position.x = 8;   // трохи праворуч від центру
+  gnome.position.x = 10;   // трохи праворуч від центру
   gnome.position.z = 5;   // по центру по Z
   // Рандомний або фіксований поворот (можеш прибрати рандом)
   gnome.rotation.y = Math.random() * Math.PI * 2;
