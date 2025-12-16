@@ -4,7 +4,6 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { GUI } from 'lil-gui';
 
-// --- Налаштування сцени ---
 const canvas = document.querySelector('#webgl');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -19,7 +18,6 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(30, 20, 40);
 
-// --- HDR оточення ---
 let pmremGenerator = new THREE.PMREMGenerator(renderer);
 pmremGenerator.compileEquirectangularShader();
 
@@ -34,7 +32,6 @@ new RGBELoader()
     texture.dispose();
   });
 
-// --- Освітлення ---
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambientLight);
 
@@ -45,7 +42,6 @@ directionalLight.shadow.mapSize.width = 2048;
 directionalLight.shadow.mapSize.height = 2048;
 scene.add(directionalLight);
 
-// --- Засніжена земля ---
 const groundGeometry = new THREE.PlaneGeometry(200, 200);
 const groundMaterial = new THREE.MeshStandardMaterial({
   color: 0xffffff,
@@ -57,7 +53,6 @@ ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 scene.add(ground);
 
-// --- П'єдестал під монумент ---
 const pedestalGeometry = new THREE.CylinderGeometry(12, 15, 4, 32);
 const pedestalMaterial = new THREE.MeshStandardMaterial({
   color: 0xaaaaaa,
@@ -70,7 +65,6 @@ pedestal.receiveShadow = true;
 pedestal.castShadow = true;
 scene.add(pedestal);
 
-// --- Завантаження основної моделі (монумент) ---
 let model;
 const gltfLoader = new GLTFLoader();
 gltfLoader.load('/models/monum.glb', (gltf) => {
@@ -109,7 +103,6 @@ gltfLoader.load('/models/monum.glb', (gltf) => {
   controls.update();
 });
 
-// --- Завантаження моделі ялинки та спавн 15 штук з перевіркою відстані ---
 let treeModel;
 gltfLoader.load('/models/tree.glb', (gltf) => {
   treeModel = gltf.scene;
@@ -139,11 +132,10 @@ gltfLoader.load('/models/tree.glb', (gltf) => {
   treeModel.position.sub(center);
   treeModel.position.y -= box.min.y;
 
-  // Масив позицій вже розміщених ялинок
   const treePositions = [];
 
-  const minDistance = 18; // мінімальна відстань між ялинками
-  const maxAttempts = 100; // захист від нескінченного циклу
+  const minDistance = 18; 
+  const maxAttempts = 100; 
 
   let placedCount = 0;
   while (placedCount < 15) {
@@ -152,11 +144,10 @@ gltfLoader.load('/models/tree.glb', (gltf) => {
 
     while (!placed && attempts < maxAttempts) {
       const angle = Math.random() * Math.PI * 2;
-      const radius = 25 + Math.random() * 35; // трохи більший радіус для 15 ялинок (25-60)
+      const radius = 25 + Math.random() * 35; 
       const newX = Math.cos(angle) * radius;
       const newZ = Math.sin(angle) * radius;
 
-      // Перевірка відстані до існуючих
       let tooClose = false;
       for (const pos of treePositions) {
         const dist = Math.sqrt((newX - pos.x) ** 2 + (newZ - pos.z) ** 2);
@@ -183,14 +174,13 @@ gltfLoader.load('/models/tree.glb', (gltf) => {
 
     if (!placed) {
       console.warn(`Не вдалося розмістити ялинку #${placedCount + 1} після ${maxAttempts} спроб`);
-      break; // виходимо, щоб не зависнути
+      break; 
     }
   }
 
   console.log(`Успішно розміщено ${placedCount} ялинок`);
 });
 
-// --- Завантаження та розміщення одного гнома (gnome1.glb) на п'єдесталі ---
 gltfLoader.load('/models/gnome1.glb', (gltf) => {
   let gnome = gltf.scene;
 
@@ -201,25 +191,21 @@ gltfLoader.load('/models/gnome1.glb', (gltf) => {
     }
   });
 
-  // Автоматичне масштабування гнома
   const box = new THREE.Box3().setFromObject(gnome);
   const size = box.getSize(new THREE.Vector3());
   const maxDim = Math.max(size.x, size.y, size.z);
-  const gnomeTargetHeight = 3.5; // бажана висота гнома
+  const gnomeTargetHeight = 3.5; 
   if (maxDim > 0) {
     gnome.scale.multiplyScalar(gnomeTargetHeight / maxDim);
   }
 
-  // Центрування та розміщення на поверхні п'єдесталу
   box.setFromObject(gnome);
   const center = box.getCenter(new THREE.Vector3());
-  gnome.position.sub(center);                    // центруємо по X/Z
-  gnome.position.y = 5.15 ;               // стоїть на п'єдесталі (Y = 4 + його власна висота)
+  gnome.position.sub(center);                 
+  gnome.position.y = 5.15 ;             
 
-  // Позиція на п'єдесталі (можеш змінити)
-  gnome.position.x = 10;   // трохи праворуч від центру
-  gnome.position.z = 5;   // по центру по Z
-  // Рандомний або фіксований поворот (можеш прибрати рандом)
+  gnome.position.x = 10;  
+  gnome.position.z = 5;   
   gnome.rotation.y = Math.random() * Math.PI * 2;
 
   scene.add(gnome)
@@ -227,7 +213,6 @@ gltfLoader.load('/models/gnome1.glb', (gltf) => {
   console.error('Помилка завантаження gnome1.glb:', err);
 });
 
-// --- Система частинок: сніг ---
 const snowCount = 12000;
 const snowPositions = new Float32Array(snowCount * 3);
 for (let i = 0; i < snowCount * 3; i += 3) {
@@ -250,21 +235,17 @@ const snowMaterial = new THREE.PointsMaterial({
 const snow = new THREE.Points(snowGeometry, snowMaterial);
 scene.add(snow);
 
-// --- Керування камерою ---
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 
-// --- Параметри для День/Ніч ---
 const params = {
   isNight: false,
   fogDensity: 0.002
 };
 
-// Початковий туман (день)
 scene.fog = new THREE.FogExp2(0xd0e0f0, params.fogDensity);
 
-// --- Debug UI ---
 const gui = new GUI();
 
 gui.add(params, 'isNight').name('Ніч').onChange(value => {
@@ -299,7 +280,6 @@ gui.add(snowMaterial, 'size', 0.05, 0.4).name('Розмір сніжинок');
 gui.add(snowMaterial, 'opacity', 0, 1).name('Інтенсивність снігу');
 gui.add(controls, 'autoRotate').name('Автообертання');
 
-// --- Анімація (з вітром для снігу) ---
 const clock = new THREE.Clock();
 
 function animate() {
